@@ -230,6 +230,10 @@
 	status = "disabled";
 };*/
 
+&av1d {
+	status = "okay";
+};
+
 &av1d_mmu {
 	status = "okay";
 };
@@ -789,6 +793,7 @@
 			data-role = "dual";
 			power-role = "dual";
 			try-power-role = "sink";
+			faster-pd-negotiation;
 			op-sink-microwatt = <15000000>;
 			sink-pdos =
 				// <PDO_FIXED(5000, 3000, PDO_FIXED_USB_COMM)>;
@@ -1016,4 +1021,21 @@ status = "okay";
 
 &sata0 {
 	status = "okay";
+};
+
+&hdptxphy_hdmi_clk0 {
+	status = "okay";
+};
+
+&hdptxphy_hdmi1 {
+	status = "okay";
+};
+
+&hdptxphy_hdmi_clk1 {
+	status = "okay";
+};
+
+&display_subsystem {
+	clocks = <&hdptxphy_hdmi_clk0>, <&hdptxphy_hdmi_clk1>;
+	clock-names = "hdmi0_phy_pll", "hdmi1_phy_pll";
 };
