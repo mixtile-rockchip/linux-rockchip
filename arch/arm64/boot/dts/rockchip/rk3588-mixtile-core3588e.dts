@@ -14,7 +14,6 @@
 #include <dt-bindings/display/rockchip_vop.h>
 #include <dt-bindings/sensor-dev.h>
 
-#include "dt-bindings/usb/pd.h"
 #include "rk3588.dtsi"
 #include "rk3588-rk806-single.dtsi"
 #include "rk3588-linux.dtsi"
@@ -92,24 +91,38 @@
 		};
 	};
 
+	dp-con {
+		compatible = "dp-connector";
+		status = "okay";
+		
+		port {
+			dp_con_in_edp1: endpoint {
+				remote-endpoint = <&edp1_out_dp_con>;
+			};
+		};
+	};
+
 	hdmi0_sound: hdmi0-sound {
 		status = "okay";
 		compatible = "rockchip,hdmi";
 		rockchip,mclk-fs = <128>;
-		rockchip,card-name = "rockchip-hdmi0";
+		rockchip,card-name = "rockchip-hdmi0-sound";
 		rockchip,cpu = <&i2s5_8ch>;
 		rockchip,codec = <&hdmi0>;
 		rockchip,jack-det;
 	};
 
 	edp1_sound: edp1-sound {
-		status = "okay";
-		compatible = "rockchip,hdmi";
-		rockchip,card-name = "rockchip-edp1";
-		rockchip,mclk-fs = <512>;
-		rockchip,cpu = <&i2s6_8ch>;
-		rockchip,codec = <&edp1>;
-		rockchip,jack-det;
+		compatible = "simple-audio-card";
+		simple-audio-card,name = "rockchip-edp1-sound";
+		
+		simple-audio-card,cpu {
+			sound-dai = <&spdif_tx4>;
+		};
+		
+		simple-audio-card,codec {
+			sound-dai = <&edp1 1>;
+		};
 	};
 
 	pcie20_avdd0v85: pcie20-avdd0v85 {
@@ -162,6 +175,18 @@
 		regulator-always-on;
 		gpios = <&gpio1 RK_PB2 GPIO_ACTIVE_HIGH>;
 		startup-delay-us = <10000>;
+		vin-supply = <&vcc12v_dcin>;
+	};
+
+	vcc_hdmi: vcc-hdmi {
+		compatible = "regulator-fixed";
+		regulator-name = "vcc_hdmi";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		regulator-boot-on;
+		regulator-always-on;
+		enable-active-high;
+		gpios = <&gpio0 RK_PC4 GPIO_ACTIVE_HIGH>;
 		vin-supply = <&vcc12v_dcin>;
 	};
 
@@ -566,14 +591,6 @@
 	clock-names = "hdmi0_phy_pll";
 };
 
-&hdptxphy_hdmi0 {
-	status = "okay";
-};
-
-&hdptxphy_hdmi0 {
-	status = "okay";
-};
-
 &combphy0_ps {
 	status = "okay";
 };
@@ -587,6 +604,10 @@
 };
 
 &spdif_tx2 {
+	status = "okay";
+};
+
+&spdif_tx4 {
 	status = "okay";
 };
 
@@ -625,6 +646,10 @@
 };
 
 &hdmi0 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&hdmim0_tx0_cec &hdmim1_tx0_hpd &hdmim0_tx0_scl &hdmim0_tx0_sda>;
+	/* Effective level used to trigger HPD: 0-low, 1-high */
+	hpd-trigger-level = <0>;
 	status = "okay";
 };
 
@@ -648,8 +673,17 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&edp1_hpd>;
 	hpd-gpios = <&gpio3 RK_PB7 GPIO_ACTIVE_HIGH>;
-	//force-hpd;
+	#sound-dai-cells = <1>;
 	status = "okay";
+
+	ports {
+		port@1 {
+			reg = <1>;
+			edp1_out_dp_con: endpoint {
+				remote-endpoint = <&dp_con_in_edp1>;
+			};
+		};
+	};
 };
 
 &edp1_in_vp2 {

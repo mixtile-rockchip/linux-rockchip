@@ -123,6 +123,9 @@ dtbo-$(CONFIG_ARCH_ROCKCHIP) += \
 	radxa-nx5-io-rpi-camera-v2-cam1.dtbo \
 	turing-rk1-sata2.dtbo \
 	mixtile-blade3-sata2.dtbo \
+	mixtile-core3588e-40pins.dtbo \
+	mixtile-core3588e-rpi-camera-v2-on-cam0.dtbo \
+	mixtile-core3588e-rpi-camera-v2-on-cam1.dtbo \
 	radxa-zero3-rpi-camera-v2.dtbo \
 	radxa-zero3-rpi-camera-v1.3.dtbo \
 	radxa-zero3-external-antenna.dtbo \
